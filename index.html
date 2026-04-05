@@ -601,17 +601,64 @@
       + '</svg>';
   }
 
+  function createPeonySVG(size) {
+    var cx = size / 2, cy = size / 2;
+    var hueBase = 335 + Math.random() * 18;
+    var sat = 50 + Math.random() * 25;
+    var layers = 3;
+    var content = '';
+
+    /* Outer ruffled petals */
+    for (var layer = 0; layer < layers; layer++) {
+      var petalCount = 8 + layer * 4;
+      var radius = size * (0.42 - layer * 0.1);
+      var petalW = size * (0.14 - layer * 0.02);
+      var lightness = 80 + layer * 5 + Math.random() * 4;
+      var opac = 0.75 + layer * 0.08;
+
+      for (var i = 0; i < petalCount; i++) {
+        var angle = (360 / petalCount) * i + (layer * 15) + (Math.random() * 8 - 4);
+        var wobbleX = (Math.random() - 0.5) * 2;
+        var wobbleY = (Math.random() - 0.5) * 2;
+        content += '<ellipse cx="' + (cx + wobbleX) + '" cy="' + (cy - radius * 0.48 + wobbleY) + '"'
+          + ' rx="' + (petalW + Math.random() * 1.5) + '" ry="' + (radius * 0.44 + Math.random() * 2) + '"'
+          + ' fill="hsl(' + hueBase + ', ' + sat + '%, ' + lightness + '%)"'
+          + ' stroke="hsl(' + hueBase + ', ' + (sat - 8) + '%, ' + (lightness - 8) + '%)" stroke-width="0.25"'
+          + ' transform="rotate(' + angle + ' ' + cx + ' ' + cy + ')" opacity="' + opac + '"/>';
+      }
+    }
+
+    /* Fluffy center tuft */
+    for (var j = 0; j < 12; j++) {
+      var dx = (Math.random() - 0.5) * size * 0.14;
+      var dy = (Math.random() - 0.5) * size * 0.14;
+      var r = 1 + Math.random() * 2;
+      var l = 88 + Math.random() * 6;
+      content += '<circle cx="' + (cx + dx) + '" cy="' + (cy + dy) + '" r="' + r + '"'
+        + ' fill="hsl(' + hueBase + ', ' + (sat + 5) + '%, ' + l + '%)" opacity="0.7"/>';
+    }
+
+    /* Golden center dot */
+    content += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (size * 0.035) + '" fill="#e6c76e" opacity="0.5"/>';
+
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" xmlns="http://www.w3.org/2000/svg">'
+      + content + '</svg>';
+  }
+
   /* ════════════════════════════════════
      SPAWN FLOATING FLOWERS
      ════════════════════════════════════ */
   (function createFlowers() {
     var container = document.getElementById('flowersBg');
-    var count = 16;
+    var count = 18;
 
     for (var i = 0; i < count; i++) {
-      var isDaisy = Math.random() > 0.45;
+      var roll = Math.random();
       var size = 28 + Math.floor(Math.random() * 30);
-      var svgHTML = isDaisy ? createDaisySVG(size) : createLilySVG(size);
+      var svgHTML;
+      if (roll < 0.33) svgHTML = createDaisySVG(size);
+      else if (roll < 0.66) svgHTML = createLilySVG(size);
+      else svgHTML = createPeonySVG(size + 8);
 
       var wrapper = document.createElement('div');
       wrapper.classList.add('flower-item');
